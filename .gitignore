@@ -1,1 +1,4 @@
 instance/sistem_pakar.db
+__pycache__/
+*.pyc
+*.pyo

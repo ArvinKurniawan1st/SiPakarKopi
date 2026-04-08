@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+{% block title %}Diagnosa Penyakit Kopi — SiPakar Kopi{% endblock %}
+
+{% block content %}
+<div class="hero-card">
+  <div class="row align-items-center">
+    <div class="col-md-8">
+      <h1><i class="bi bi-clipboard-pulse me-2"></i>Diagnosa Penyakit Kopi</h1>
+      <p>Pilih gejala yang tampak pada tanaman kopi Anda, atur tingkat keyakinan, lalu klik Diagnosa untuk mendapatkan hasil analisis berbasis <strong>Certainty Factor</strong>.</p>
+    </div>
+    <div class="col-md-4 text-end d-none d-md-block">
+      <span style="font-size:5rem; opacity:.3">☕</span>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Kolom Kiri: Pilih Gejala -->
+  <div class="col-lg-7">
+    <div class="card mb-3">
+      <div class="card-header">
+        <i class="bi bi-list-check me-2"></i>Pilih Gejala yang Diamati
+        <span class="badge bg-light text-dark ms-2" id="counter">0 dipilih</span>
+      </div>
+      <div class="card-body p-3">
+        <!-- Filter kategori -->
+        <div class="mb-3 d-flex gap-2 flex-wrap">
+          <button class="btn btn-sm filter-btn active" data-cat="semua" onclick="filterKat(this)">Semua</button>
+          <button class="btn btn-sm filter-btn" data-cat="daun"   onclick="filterKat(this)"><span class="badge-kategori kat-daun">🌿 Daun</span></button>
+          <button class="btn btn-sm filter-btn" data-cat="buah"   onclick="filterKat(this)"><span class="badge-kategori kat-buah">🫘 Buah</span></button>
+          <button class="btn btn-sm filter-btn" data-cat="batang" onclick="filterKat(this)"><span class="badge-kategori kat-batang">🪵 Batang</span></button>
+          <button class="btn btn-sm filter-btn" data-cat="akar"   onclick="filterKat(this)"><span class="badge-kategori kat-akar">🌱 Akar</span></button>
+          <button class="btn btn-sm filter-btn" data-cat="umum"   onclick="filterKat(this)"><span class="badge-kategori kat-umum">📋 Umum</span></button>
+        </div>
+
+        <!-- Daftar gejala per kategori -->
+        {% for kat, gejala_list in kategori_dict.items() %}
+        <div class="mb-3 kat-section" data-kat="{{ kat }}">
+          <div class="d-flex align-items-center mb-2">
+            {% if kat == 'daun' %}<span class="badge-kategori kat-daun me-2">🌿 Daun</span>
+            {% elif kat == 'buah' %}<span class="badge-kategori kat-buah me-2">🫘 Buah</span>
+            {% elif kat == 'batang' %}<span class="badge-kategori kat-batang me-2">🪵 Batang & Ranting</span>
+            {% elif kat == 'akar' %}<span class="badge-kategori kat-akar me-2">🌱 Akar</span>
+            {% else %}<span class="badge-kategori kat-umum me-2">📋 Umum</span>{% endif %}
+          </div>
+          {% for g in gejala_list %}
+          <div class="gejala-item" id="item-{{ g.id }}" onclick="toggleGejala({{ g.id }}, event)">
+            <div class="d-flex align-items-start">
+              <input type="checkbox" id="cb-{{ g.id }}" value="{{ g.id }}"
+                     class="gejala-cb mt-1" onclick="event.stopPropagation()">
+              <label for="cb-{{ g.id }}" onclick="event.stopPropagation()">
+                {{ g.nama }}
+              </label>
+            </div>
+            <!-- Slider CF User -->
+            <div class="cf-slider-wrap" id="slider-{{ g.id }}">
+              <div class="d-flex justify-content-between mb-1">
+                <small class="cf-label">Tingkat keyakinan Anda:</small>
+                <small class="cf-label" id="cf-val-{{ g.id }}">0.8 (80%)</small>
+              </div>
+              <input type="range" class="cf-slider" id="range-{{ g.id }}"
+                     min="0.1" max="1.0" step="0.1" value="0.8"
+                     oninput="updateCFLabel({{ g.id }}, this.value)"
+                     onclick="event.stopPropagation()">
+              <div class="d-flex justify-content-between" style="font-size:.72rem;color:#666">
+                <span>Tidak yakin (0.1)</span>
+                <span>Sangat yakin (1.0)</span>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Tombol aksi -->
+    <div class="d-flex gap-2">
+      <button class="btn btn-diagnosa flex-grow-1" onclick="jalankanDiagnosa()" id="btn-diagnosa" disabled>
+        <i class="bi bi-search me-2"></i>Jalankan Diagnosa
+      </button>
+      <button class="btn btn-outline-secondary btn-reset" onclick="resetSemua()">
+        <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+      </button>
+    </div>
+  </div>
+
+  <!-- Kolom Kanan: Hasil + Info CF -->
+  <div class="col-lg-5">
+    <!-- Petunjuk -->
+    <div class="card mb-3" id="info-panel">
+      <div class="card-header"><i class="bi bi-lightbulb me-2"></i>Cara Penggunaan</div>
+      <div class="card-body">
+        <ol class="mb-2 ps-3" style="font-size:.9rem; line-height:1.9">
+          <li>Amati tanaman kopi Anda secara langsung.</li>
+          <li>Centang gejala yang <strong>terlihat jelas</strong>.</li>
+          <li>Atur <em>slider</em> keyakinan untuk setiap gejala.</li>
+          <li>Klik <strong>Jalankan Diagnosa</strong>.</li>
+        </ol>
+        <div class="rumus-box">
+          CF(H,E) = CF(H|E) × CF(E)
+        </div>
+        <div class="rumus-box">
+          CF_gabung = CF₁ + CF₂ × (1 − CF₁)
+        </div>
+        <small class="text-muted">CF(H|E) = keyakinan pakar &nbsp;|&nbsp; CF(E) = keyakinan pengguna</small>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading">
+      <div class="spinner-border spinner-green mb-3" role="status"></div>
+      <p class="text-muted">Menghitung Certainty Factor…</p>
+    </div>
+
+    <!-- Hasil diagnosis -->
+    <div id="hasil-panel" style="display:none">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0"><i class="bi bi-clipboard-data me-2 text-success"></i>Hasil Diagnosis</h5>
+        <button class="btn btn-sm btn-outline-secondary" onclick="resetSemua()">
+          <i class="bi bi-arrow-counterclockwise me-1"></i>Ulangi
+        </button>
+      </div>
+      <div id="gejala-summary" class="alert alert-success py-2 px-3 mb-3" style="font-size:.88rem"></div>
+      <div id="hasil-list"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let selected = {};  // {gejala_id: cf_user}
+
+function toggleGejala(id, e) {
+  const cb = document.getElementById('cb-' + id);
+  const item = document.getElementById('item-' + id);
+  const slider = document.getElementById('slider-' + id);
+  cb.checked = !cb.checked;
+  if (cb.checked) {
+    item.classList.add('selected');
+    slider.classList.add('show');
+    selected[id] = parseFloat(document.getElementById('range-' + id).value);
+  } else {
+    item.classList.remove('selected');
+    slider.classList.remove('show');
+    delete selected[id];
+  }
+  updateCounter();
+}
+
+function updateCFLabel(id, val) {
+  document.getElementById('cf-val-' + id).textContent = val + ' (' + Math.round(val * 100) + '%)';
+  if (selected[id] !== undefined) selected[id] = parseFloat(val);
+}
+
+function updateCounter() {
+  const n = Object.keys(selected).length;
+  document.getElementById('counter').textContent = n + ' dipilih';
+  document.getElementById('btn-diagnosa').disabled = n === 0;
+}
+
+function filterKat(btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active', 'btn-success'));
+  btn.classList.add('active');
+  const cat = btn.dataset.cat;
+  document.querySelectorAll('.kat-section').forEach(sec => {
+    sec.style.display = (cat === 'semua' || sec.dataset.kat === cat) ? '' : 'none';
+  });
+}
+
+async function jalankanDiagnosa() {
+  if (Object.keys(selected).length === 0) return;
+  document.getElementById('info-panel').style.display = 'none';
+  document.getElementById('hasil-panel').style.display = 'none';
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('btn-diagnosa').disabled = true;
+
+  try {
+    const res = await fetch('/diagnosa', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({gejala: selected})
+    });
+    const data = await res.json();
+    tampilkanHasil(data);
+  } catch(err) {
+    alert('Terjadi kesalahan: ' + err.message);
+  } finally {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('btn-diagnosa').disabled = false;
+  }
+}
+
+function tampilkanHasil(data) {
+  const panel = document.getElementById('hasil-panel');
+  const list  = document.getElementById('hasil-list');
+  const summary = document.getElementById('gejala-summary');
+
+  // Summary gejala
+  const namaGejala = data.gejala_terpilih.map(g => g.nama).join(', ');
+  summary.innerHTML = `<i class="bi bi-check2-circle me-1"></i><strong>${data.total_gejala} gejala</strong> dipilih: ${namaGejala}`;
+
+  if (!data.hasil || data.hasil.length === 0) {
+  list.innerHTML = `<div class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    Tidak ditemukan penyakit yang cocok dengan gejala yang dipilih.
+  </div>`;
+} else {
+  const semuaNegatif = data.hasil.every(h => h.cf_nilai < 0);
+
+  if (semuaNegatif) {
+    list.innerHTML = `<div class="alert alert-warning">
+      <i class="bi bi-exclamation-triangle me-2"></i>
+      Semua penyakit tidak sesuai dengan gejala (CF negatif).
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = '';
+  data.hasil.forEach((item, idx) => {
+      const rankClass = idx === 0 ? 'rank1' : idx === 1 ? 'rank2' : idx === 2 ? 'rank3' : 'other';
+      const rankIcon  = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx+1}`;
+      const pct = Math.min(item.persentase, 100);
+      const warnaCls = {danger:'danger', warning:'warning', info:'info', primary:'success', secondary:'secondary'}[item.tingkat.warna] || 'secondary';
+
+      list.innerHTML += `
+      <div class="hasil-card">
+        <div class="hasil-header ${rankClass}">
+          <span style="font-size:1.1rem; font-weight:700">${rankIcon} ${item.nama}</span>
+          <div class="d-flex align-items-center" style="min-width:120px">
+            <div class="cf-bar-wrap">
+              <div class="cf-bar" style="width:${pct}%"></div>
+            </div>
+            <span style="font-weight:700; white-space:nowrap">${item.persentase}%</span>
+          </div>
+        </div>
+        <div class="hasil-body">
+          <div class="mb-2">
+            <span class="keyakinan-badge bg-${warnaCls} text-white">${item.tingkat.label}</span>
+            <small class="text-muted ms-2"><em>${item.nama_latin}</em></small>
+          </div>
+          <p class="mb-2" style="font-size:.88rem">${item.deskripsi}</p>
+          <details>
+            <summary style="cursor:pointer; font-weight:600; color:var(--green-dark); font-size:.9rem">
+              <i class="bi bi-clipboard2-pulse me-1"></i>Penanganan & Pencegahan
+            </summary>
+            <div class="mt-2 p-2 rounded" style="background:#f8fdf8; font-size:.85rem">
+              <strong>Penanganan:</strong>
+              <p style="white-space:pre-line; margin-bottom:.5rem">${item.penanganan}</p>
+              <strong>Pencegahan:</strong>
+              <p style="white-space:pre-line; margin-bottom:0">${item.pencegahan}</p>
+            </div>
+          </details>
+          <div class="mt-2 text-end">
+            <a href="/penyakit/${item.penyakit_id}" class="btn btn-sm btn-outline-success" target="_blank">
+              <i class="bi bi-arrow-right me-1"></i>Detail Penyakit
+            </a>
+          </div>
+        </div>
+      </div>`;
+    });
+  }
+
+  panel.style.display = 'block';
+  panel.scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+function resetSemua() {
+  selected = {};
+  document.querySelectorAll('.gejala-cb').forEach(cb => cb.checked = false);
+  document.querySelectorAll('.gejala-item').forEach(el => el.classList.remove('selected'));
+  document.querySelectorAll('.cf-slider-wrap').forEach(el => el.classList.remove('show'));
+  document.querySelectorAll('.cf-slider').forEach(el => { el.value = 0.8; });
+  document.querySelectorAll('[id^="cf-val-"]').forEach(el => el.textContent = '0.8 (80%)');
+  updateCounter();
+  document.getElementById('hasil-panel').style.display = 'none';
+  document.getElementById('info-panel').style.display = 'block';
+  document.querySelectorAll('.kat-section').forEach(s => s.style.display = '');
+  document.querySelectorAll('.filter-btn').forEach((b,i) => { if(i===0) b.classList.add('active'); else b.classList.remove('active'); });
+}
+
+// Sync checkbox via label click
+document.querySelectorAll('.gejala-cb').forEach(cb => {
+  cb.addEventListener('change', function() {
+    const id = parseInt(this.value);
+    const item = document.getElementById('item-' + id);
+    const slider = document.getElementById('slider-' + id);
+    if (this.checked) {
+      item.classList.add('selected');
+      slider.classList.add('show');
+      selected[id] = parseFloat(document.getElementById('range-' + id).value);
+    } else {
+      item.classList.remove('selected');
+      slider.classList.remove('show');
+      delete selected[id];
+    }
+    updateCounter();
+  });
+});
+</script>
+<style>
+.filter-btn { border-radius: 20px; border: 1.5px solid #ccc; background: white; transition: all .15s; }
+.filter-btn.active { border-color: var(--green-mid); background: var(--green-pale); }
+details summary::-webkit-details-marker { color: var(--green-mid); }
+</style>
+{% endblock %}

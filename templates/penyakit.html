@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Daftar Penyakit Kopi — SiPakar Kopi{% endblock %}
+
+{% block content %}
+<div class="hero-card">
+  <h1><i class="bi bi-bug me-2"></i>Daftar Penyakit Tanaman Kopi</h1>
+  <p>Basis pengetahuan sistem pakar — 6 jenis penyakit utama tanaman kopi beserta gejala dan penanganannya.</p>
+</div>
+
+<div class="row g-3">
+  {% for p in penyakit %}
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header coffee">
+        <i class="bi bi-virus me-2"></i>{{ p.kode }} — {{ p.nama }}
+      </div>
+      <div class="card-body">
+        <p class="text-muted mb-2" style="font-style:italic; font-size:.88rem">{{ p.nama_latin }}</p>
+        <p style="font-size:.9rem">{{ p.deskripsi[:180] }}…</p>
+        <a href="/penyakit/{{ p.id }}" class="btn btn-sm btn-outline-success">
+          <i class="bi bi-arrow-right me-1"></i>Lihat Detail & Aturan CF
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

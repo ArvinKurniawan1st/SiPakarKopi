@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Tentang Sistem — SiPakar Kopi{% endblock %}
+
+{% block content %}
+<div class="hero-card">
+  <h1><i class="bi bi-info-circle me-2"></i>Tentang Sistem</h1>
+  <p>Informasi mengenai metode Certainty Factor yang digunakan dalam sistem pakar ini.</p>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card mb-3">
+      <div class="card-header"><i class="bi bi-book me-2"></i>Metode Certainty Factor</div>
+      <div class="card-body">
+        <p>
+          <strong>Certainty Factor (CF)</strong> adalah metode yang dikembangkan oleh Shortliffe dan Buchanan
+          pada tahun 1975 untuk merepresentasikan ketidakpastian dalam sistem pakar MYCIN.
+          Metode ini mengukur tingkat kepercayaan pakar terhadap suatu hipotesis berdasarkan bukti yang ada.
+        </p>
+
+        <h6 class="text-success mt-3">1. Formula Dasar CF</h6>
+        <div class="rumus-box">CF(H, E) = CF(H|E) × CF(E)</div>
+        <ul style="font-size:.9rem">
+          <li><strong>CF(H|E)</strong> = Certainty Factor pakar (keyakinan pakar bahwa gejala E mengindikasikan penyakit H)</li>
+          <li><strong>CF(E)</strong> = Certainty Factor pengguna (seberapa yakin pengguna bahwa gejala E benar-benar ada)</li>
+          <li>Rentang nilai: <code>-1.0</code> (pasti tidak) hingga <code>1.0</code> (pasti ya)</li>
+        </ul>
+
+        <h6 class="text-success mt-3">2. Kombinasi Beberapa Aturan</h6>
+        <p style="font-size:.9rem">Jika ada beberapa aturan yang mendukung hipotesis yang sama, CF digabungkan:</p>
+        <div class="rumus-box">
+          Jika CF1 ≥ 0 dan CF2 ≥ 0:<br>
+          &nbsp;&nbsp;CF_gabung = CF1 + CF2 × (1 − CF1)<br><br>
+          Jika CF1 &lt; 0 dan CF2 &lt; 0:<br>
+          &nbsp;&nbsp;CF_gabung = CF1 + CF2 × (1 + CF1)<br><br>
+          Jika salah satu negatif:<br>
+          &nbsp;&nbsp;CF_gabung = (CF1 + CF2) / (1 − min(|CF1|, |CF2|))
+        </div>
+
+        <h6 class="text-success mt-3">3. Contoh Perhitungan</h6>
+        <div class="table-responsive">
+          <table class="table table-bordered table-sm" style="font-size:.85rem">
+            <thead class="table-success">
+              <tr><th>Gejala</th><th>CF Pakar</th><th>CF User</th><th>CF Rule</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Bercak oranye bawah daun</td><td>0.90</td><td>0.80</td><td>0.90 × 0.80 = <strong>0.72</strong></td></tr>
+              <tr><td>Serbuk kekuningan</td><td>0.90</td><td>0.60</td><td>0.90 × 0.60 = <strong>0.54</strong></td></tr>
+              <tr><td colspan="3" class="text-end">CF Gabung (aturan 1+2):</td><td><strong>0.72 + 0.54 × (1 − 0.72) = 0.87</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size:.88rem" class="text-muted">Nilai CF = 0.87 → <strong>87% keyakinan</strong> bahwa tanaman menderita Karat Daun.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card mb-3">
+      <div class="card-header"><i class="bi bi-layers me-2"></i>Arsitektur Sistem</div>
+      <div class="card-body" style="font-size:.9rem">
+        <ul class="list-unstyled">
+          <li class="mb-2">🌐 <strong>Framework:</strong> Python Flask</li>
+          <li class="mb-2">🗄️ <strong>Database:</strong> SQLite + SQLAlchemy ORM</li>
+          <li class="mb-2">🧠 <strong>Mesin Inferensi:</strong> Certainty Factor</li>
+          <li class="mb-2">🎨 <strong>Frontend:</strong> Bootstrap 5 + Vanilla JS</li>
+          <li class="mb-2">🦠 <strong>Jumlah Penyakit:</strong> 6 penyakit utama</li>
+          <li class="mb-2">🔍 <strong>Jumlah Gejala:</strong> 28 gejala</li>
+          <li>📋 <strong>Jumlah Aturan:</strong> 42 aturan IF-THEN</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header"><i class="bi bi-speedometer2 me-2"></i>Interpretasi Nilai CF</div>
+      <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+          <thead class="table-light"><tr><th>Rentang CF</th><th>Interpretasi</th></tr></thead>
+          <tbody style="font-size:.85rem">
+            <tr><td>0.81 – 1.00</td><td><span class="badge bg-danger">Hampir Pasti</span></td></tr>
+            <tr><td>0.61 – 0.80</td><td><span class="badge bg-warning text-dark">Kemungkinan Besar</span></td></tr>
+            <tr><td>0.41 – 0.60</td><td><span class="badge bg-primary">Kemungkinan</span></td></tr>
+            <tr><td>0.21 – 0.40</td><td><span class="badge bg-info text-dark">Kemungkinan Kecil</span></td></tr>
+            <tr><td>0.00 – 0.20</td><td><span class="badge bg-secondary">Tidak Yakin</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><i class="bi bi-diagram-3 me-2"></i>Struktur File Proyek</div>
+      <div class="card-body">
+        <pre style="font-size:.8rem; margin:0; background:none; padding:0"><code>sistem_pakar_kopi/
+├── app.py          ← Flask routes
+├── cf_engine.py    ← Mesin CF
+├── database.py     ← Model + seed data
+└── templates/
+    ├── base.html
+    ├── index.html  ← Halaman diagnosa
+    ├── penyakit.html
+    ├── penyakit_detail.html
+    └── tentang.html</code></pre>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

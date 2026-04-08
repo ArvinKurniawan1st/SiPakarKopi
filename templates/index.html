@@ -202,23 +202,14 @@ function tampilkanHasil(data) {
   summary.innerHTML = `<i class="bi bi-check2-circle me-1"></i><strong>${data.total_gejala} gejala</strong> dipilih: ${namaGejala}`;
 
   if (!data.hasil || data.hasil.length === 0) {
-  list.innerHTML = `<div class="alert alert-warning">
-    <i class="bi bi-exclamation-triangle me-2"></i>
-    Tidak ditemukan penyakit yang cocok dengan gejala yang dipilih.
-  </div>`;
-} else {
-  const semuaNegatif = data.hasil.every(h => h.cf_nilai < 0);
-
-  if (semuaNegatif) {
     list.innerHTML = `<div class="alert alert-warning">
       <i class="bi bi-exclamation-triangle me-2"></i>
-      Semua penyakit tidak sesuai dengan gejala (CF negatif).
+      Tidak ditemukan penyakit yang cocok dengan gejala yang dipilih.
     </div>`;
-    return;
-  }
-
-  list.innerHTML = '';
-  data.hasil.forEach((item, idx) => {
+  } else {
+    
+    list.innerHTML = '';
+    data.hasil.forEach((item, idx) => {
       const rankClass = idx === 0 ? 'rank1' : idx === 1 ? 'rank2' : idx === 2 ? 'rank3' : 'other';
       const rankIcon  = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx+1}`;
       const pct = Math.min(item.persentase, 100);

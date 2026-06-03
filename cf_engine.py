@@ -84,21 +84,21 @@ class CertaintyFactorEngine:
         cf_abs = abs(cf)
         if cf < 0:
             if cf_abs >= 0.8:
-                label, warna = "Hampir Pasti Tidak", "danger"
+                label, warna = "Hampir Pasti Tidak", "secondary"
             elif cf_abs >= 0.6:
-                label, warna = "Kemungkinan Besar Tidak", "warning"
+                label, warna = "Kemungkinan Besar Tidak", "secondary"
             else:
-                label, warna = "Mungkin Tidak", "secondary"
+                label, warna = "Mungkin Tidak", "danger"
         elif cf_abs < 0.2:
-            label, warna = "Tidak Yakin", "secondary"
+            label, warna = "Tidak Yakin", "danger"
         elif cf_abs < 0.4:
             label, warna = "Kemungkinan Kecil", "info"
         elif cf_abs < 0.6:
-            label, warna = "Kemungkinan", "primary"
+            label, warna = "Kemungkinan", "warning"
         elif cf_abs < 0.8:
             label, warna = "Kemungkinan Besar", "warning"
         else:
-            label, warna = "Hampir Pasti", "danger"
+            label, warna = "Hampir Pasti", "primary"
 
         return {'label': label, 'warna': warna}
 

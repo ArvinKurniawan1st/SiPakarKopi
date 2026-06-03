@@ -2,83 +2,113 @@
 {% block title %}{{ penyakit.nama }} - SiPakar Kopi{% endblock %}
 
 {% block content %}
-<nav aria-label="breadcrumb" class="mb-3">
+<nav aria-label="breadcrumb" class="mb-4">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="/">Beranda</a></li>
-    <li class="breadcrumb-item"><a href="/penyakit">Penyakit</a></li>
+    <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-fill me-1"></i>Beranda</a></li>
+    <li class="breadcrumb-item"><a href="/penyakit"><i class="bi bi-bug me-1"></i>Penyakit</a></li>
     <li class="breadcrumb-item active">{{ penyakit.nama }}</li>
   </ol>
 </nav>
 
 <div class="row g-4">
   <div class="col-lg-8">
-    <div class="card mb-3">
+    <div class="card">
       <div class="card-header coffee">
         <i class="bi bi-virus me-2"></i>{{ penyakit.kode }} — {{ penyakit.nama }}
       </div>
       <div class="card-body">
-        <p class="text-muted mb-3" style="font-style:italic">{{ penyakit.nama_latin }}</p>
-        <h6 class="text-success">Deskripsi</h6>
-        <p>{{ penyakit.deskripsi }}</p>
+        <p style="font-style:italic; color: #666; font-size: 1rem; margin-bottom: 1.5rem;">
+          <strong>Nama ilmiah:</strong> {{ penyakit.nama_latin }}
+        </p>
 
-        <h6 class="text-success mt-3">Penanganan</h6>
-        <p style="white-space: pre-line">{{ penyakit.penanganan }}</p>
+        <h5 style="color: var(--green-dark); font-weight: 700; margin-top: 2rem; margin-bottom: 1rem;">
+          <i class="bi bi-info-circle me-2"></i>Deskripsi
+        </h5>
+        <p style="font-size: 1rem; line-height: 1.8; color: #2c3e50;">{{ penyakit.deskripsi }}</p>
 
-        <h6 class="text-success mt-3">Pencegahan</h6>
-        <p style="white-space: pre-line">{{ penyakit.pencegahan }}</p>
+        <h5 style="color: var(--green-dark); font-weight: 700; margin-top: 2rem; margin-bottom: 1rem;">
+          <i class="bi bi-tools me-2"></i>Penanganan
+        </h5>
+        <div
+          style="background: #F0F8FF; border-left: 4px solid #3498DB; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+          <p style="font-size: 1rem; line-height: 1.8; white-space: pre-line; margin: 0; color: #2c3e50;">{{
+            penyakit.penanganan }}</p>
+        </div>
+
+        <h5 style="color: var(--green-dark); font-weight: 700; margin-top: 2rem; margin-bottom: 1rem;">
+          <i class="bi bi-shield-check me-2"></i>Pencegahan
+        </h5>
+        <div style="background: #F0FFF0; border-left: 4px solid #52B788; padding: 1.5rem; border-radius: 8px;">
+          <p style="font-size: 1rem; line-height: 1.8; white-space: pre-line; margin: 0; color: #2c3e50;">{{
+            penyakit.pencegahan }}</p>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="col-lg-4">
-    <div class="card">
+    <div class="card mb-4">
       <div class="card-header">
-        <i class="bi bi-table me-2"></i>Aturan Basis Pengetahuan (CF)
+        <i class="bi bi-list-check me-2"></i>Gejala yang Khas
       </div>
-      <div class="card-body p-0">
-        <table class="table table-sm mb-0">
-          <thead class="table-light">
-            <tr>
-              <th>Gejala</th>
-              <th class="text-center" style="width:70px">CF Pakar</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for a in aturan %}
-            {% set g = gejala_dict[a.gejala_id] %}
-            <tr>
-              <td style="font-size:.85rem">{{ g.nama }}</td>
-              <td class="text-center">
-                <span class="badge
-                  {% if a.cf_pakar >= 0.8 %}bg-danger
-                  {% elif a.cf_pakar >= 0.6 %}bg-warning text-dark
-                  {% else %}bg-info text-dark{% endif %}">
-                  {{ "%.2f"|format(a.cf_pakar) }}
-                </span>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="card mt-3">
-      <div class="card-header"><i class="bi bi-calculator me-2"></i>Keterangan Nilai CF</div>
-      <div class="card-body" style="font-size:.85rem">
-        <div class="d-flex gap-2 mb-1 align-items-center">
-          <span class="badge bg-danger">≥ 0.8</span> Sangat kuat / sangat khas
-        </div>
-        <div class="d-flex gap-2 mb-1 align-items-center">
-          <span class="badge bg-warning text-dark">0.6–0.79</span> Kuat
-        </div>
-        <div class="d-flex gap-2 align-items-center">
-          <span class="badge bg-info text-dark">&lt; 0.6</span> Cukup / pendukung
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--green-light);">
+                <th style="color: var(--green-dark); font-weight: 700; padding: 1rem 0.75rem; font-size: 0.95rem;">
+                  Gejala</th>
+                <th
+                  style="text-align: center; color: var(--green-dark); font-weight: 700; padding: 1rem 0.75rem; font-size: 0.95rem; width: 80px;">
+                  Tingkat</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for a in aturan %}
+              {% set g = gejala_dict[a.gejala_id] %}
+              <tr style="border-bottom: 1px solid #e0e0e0;">
+                <td style="padding: 1rem 0.75rem; font-size: 0.95rem; color: #2c3e50;">{{ g.nama }}</td>
+                <td style="text-align: center; padding: 1rem 0.75rem;">
+                  <span class="badge
+                    {% if a.cf_pakar >= 0.8 %}bg-danger
+                    {% elif a.cf_pakar >= 0.6 %}bg-warning text-dark
+                    {% else %}bg-info text-dark{% endif %}" style="font-size: 0.9rem; font-weight: 700;">
+                    {{ "%.2f"|format(a.cf_pakar) }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
 
-    <div class="mt-3">
+    <div class="card mb-4">
+      <div class="card-header"><i class="bi bi-question-circle me-2"></i>Skala Nilai CF</div>
+      <div class="card-body">
+        <div style="margin-bottom: 1.25rem;">
+          <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.75rem;">
+            <span class="badge bg-danger" style="font-size: 0.9rem; padding: 0.6em 0.9em; font-weight: 700;">≥
+              0.80</span>
+            <span style="font-size: 0.95rem; color: #2c3e50;"><strong>Sangat Khas</strong> — Gejala yang paling
+              ciri</span>
+          </div>
+          <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.75rem;">
+            <span class="badge bg-warning text-dark"
+              style="font-size: 0.9rem; padding: 0.6em 0.9em; font-weight: 700;">0.60-0.79</span>
+            <span style="font-size: 0.95rem; color: #2c3e50;"><strong>Kuat</strong> — Gejala yang jelas</span>
+          </div>
+          <div style="display: flex; gap: 1rem; align-items: center;">
+            <span class="badge bg-info text-dark"
+              style="font-size: 0.9rem; padding: 0.6em 0.9em; font-weight: 700;">&lt; 0.60</span>
+            <span style="font-size: 0.95rem; color: #2c3e50;"><strong>Pendukung</strong> — Gejala pelengkap</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
       <a href="/" class="btn btn-diagnosa w-100">
         <i class="bi bi-clipboard-pulse me-2"></i>Mulai Diagnosa
       </a>

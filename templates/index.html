@@ -5,12 +5,12 @@
 <div class="hero-card">
   <div class="row align-items-center">
     <div class="col-md-8">
-      <h1><i class="bi bi-clipboard-pulse me-2"></i>Diagnosa Penyakit Kopi</h1>
-      <p>Pilih gejala yang tampak pada tanaman kopi Anda, atur tingkat keyakinan, lalu klik Diagnosa untuk mendapatkan
-        hasil analisis berbasis <strong>Certainty Factor</strong>.</p>
+      <h1><i class="bi bi-clipboard-pulse me-2"></i>Diagnosa Penyakit Tanaman Kopi</h1>
+      <p>Amati tanaman kopi Anda, pilih gejala yang terlihat, lalu sistem akan menganalisis kemungkinan penyakitnya
+        menggunakan teknologi Certainty Factor.</p>
     </div>
     <div class="col-md-4 text-end d-none d-md-block">
-      <span style="font-size:5rem; opacity:.3">☕</span>
+      <span style="font-size:6rem; opacity:.2">☕</span>
     </div>
   </div>
 </div>
@@ -20,13 +20,16 @@
   <div class="col-lg-7">
     <div class="card mb-3">
       <div class="card-header">
-        <i class="bi bi-list-check me-2"></i>Pilih Gejala yang Diamati
-        <span class="badge bg-light text-dark ms-2" id="counter">0 dipilih</span>
+        <div class="d-flex align-items-center justify-content-between">
+          <div><i class="bi bi-list-check me-2"></i>Pilih Gejala yang Anda Lihat</div>
+          <span class="badge bg-light text-dark" id="counter">0 dipilih</span>
+        </div>
       </div>
-      <div class="card-body p-3">
+      <div class="card-body">
         <!-- Filter kategori -->
-        <div class="mb-3 d-flex gap-2 flex-wrap">
-          <button class="btn btn-sm filter-btn active" data-cat="semua" onclick="filterKat(this)">Semua</button>
+        <div class="mb-4 d-flex gap-2 flex-wrap">
+          <button class="btn btn-sm filter-btn active" data-cat="semua" onclick="filterKat(this)"
+            style="font-weight: 600;">Semua Gejala</button>
           <button class="btn btn-sm filter-btn" data-cat="daun" onclick="filterKat(this)"><span
               class="badge-kategori kat-daun">🌿 Daun</span></button>
           <button class="btn btn-sm filter-btn" data-cat="buah" onclick="filterKat(this)"><span
@@ -41,18 +44,18 @@
 
         <!-- Daftar gejala per kategori -->
         {% for kat, gejala_list in kategori_dict.items() %}
-        <div class="mb-3 kat-section" data-kat="{{ kat }}">
-          <div class="d-flex align-items-center mb-2">
-            {% if kat == 'daun' %}<span class="badge-kategori kat-daun me-2">🌿 Daun</span>
-            {% elif kat == 'buah' %}<span class="badge-kategori kat-buah me-2">🍒 Buah</span>
-            {% elif kat == 'batang' %}<span class="badge-kategori kat-batang me-2">🌳 Batang & Ranting</span>
-            {% elif kat == 'akar' %}<span class="badge-kategori kat-akar me-2">🌱 Akar</span>
-            {% else %}<span class="badge-kategori kat-umum me-2">📋 Umum</span>{% endif %}
+        <div class="mb-4 kat-section" data-kat="{{ kat }}">
+          <div class="d-flex align-items-center mb-3">
+            {% if kat == 'daun' %}<span class="badge-kategori kat-daun me-2">🌿 Gejala Daun</span>
+            {% elif kat == 'buah' %}<span class="badge-kategori kat-buah me-2">🍒 Gejala Buah</span>
+            {% elif kat == 'batang' %}<span class="badge-kategori kat-batang me-2">🌳 Gejala Batang & Ranting</span>
+            {% elif kat == 'akar' %}<span class="badge-kategori kat-akar me-2">🌱 Gejala Akar</span>
+            {% else %}<span class="badge-kategori kat-umum me-2">📋 Gejala Umum</span>{% endif %}
           </div>
           {% for g in gejala_list %}
           <div class="gejala-item" id="item-{{ g.id }}" onclick="toggleGejala({{ g.id }}, event)">
             <div class="d-flex align-items-start">
-              <input type="checkbox" id="cb-{{ g.id }}" value="{{ g.id }}" class="gejala-cb mt-1"
+              <input type="checkbox" id="cb-{{ g.id }}" value="{{ g.id }}" class="gejala-cb"
                 onclick="event.stopPropagation()">
               <label for="cb-{{ g.id }}" onclick="event.stopPropagation()">
                 {{ g.nama }}
@@ -60,15 +63,16 @@
             </div>
             <!-- Slider CF User -->
             <div class="cf-slider-wrap" id="slider-{{ g.id }}">
-              <div class="d-flex justify-content-between mb-1">
-                <small class="cf-label">Tingkat keyakinan Anda:</small>
-                <small class="cf-label" id="cf-val-{{ g.id }}">0.8 (80%)</small>
+              <div class="d-flex justify-content-between mb-2">
+                <small class="cf-label">Seberapa yakin Anda?</small>
+                <small class="cf-label" id="cf-val-{{ g.id }}">80%</small>
               </div>
               <input type="range" class="cf-slider" id="range-{{ g.id }}" min="0.1" max="1.0" step="0.1" value="0.8"
                 oninput="updateCFLabel({{ g.id }}, this.value)" onclick="event.stopPropagation()">
-              <div class="d-flex justify-content-between" style="font-size:.72rem;color:#666">
-                <span>Tidak yakin (0.1)</span>
-                <span>Sangat yakin (1.0)</span>
+              <div class="d-flex justify-content-between mt-2"
+                style="font-size: 0.9rem; color: #666; font-weight: 500;">
+                <span>Tidak yakin</span>
+                <span>Sangat yakin</span>
               </div>
             </div>
           </div>
@@ -83,7 +87,7 @@
       <button class="btn btn-diagnosa flex-grow-1" onclick="jalankanDiagnosa()" id="btn-diagnosa" disabled>
         <i class="bi bi-search me-2"></i>Jalankan Diagnosa
       </button>
-      <button class="btn btn-outline-secondary btn-reset" onclick="resetSemua()">
+      <button class="btn btn-reset" onclick="resetSemua()">
         <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
       </button>
     </div>
@@ -93,39 +97,42 @@
   <div class="col-lg-5">
     <!-- Petunjuk -->
     <div class="card mb-3" id="info-panel">
-      <div class="card-header"><i class="bi bi-lightbulb me-2"></i>Cara Penggunaan</div>
+      <div class="card-header"><i class="bi bi-lightbulb me-2"></i>Panduan Penggunaan</div>
       <div class="card-body">
-        <ol class="mb-2 ps-3" style="font-size:.9rem; line-height:1.9">
-          <li>Amati tanaman kopi Anda secara langsung.</li>
-          <li>Centang gejala yang <strong>terlihat jelas</strong>.</li>
-          <li>Atur <em>slider</em> keyakinan untuk setiap gejala.</li>
-          <li>Klik <strong>Jalankan Diagnosa</strong>.</li>
+        <ol style="font-size: 1rem; line-height: 2; padding-left: 1.5rem;">
+          <li style="margin-bottom: 0.75rem;"><strong>Amati tanaman Anda</strong> dengan teliti.</li>
+          <li style="margin-bottom: 0.75rem;">Centang gejala yang <strong>benar-benar terlihat</strong> pada tanaman.
+          </li>
+          <li style="margin-bottom: 0.75rem;">Untuk setiap gejala, atur <strong>tingkat keyakinan Anda</strong>
+            menggunakan slider.</li>
+          <li style="margin-bottom: 0.75rem;">Klik tombol <strong>"Jalankan Diagnosa"</strong> untuk melihat hasil.</li>
         </ol>
-        <div class="rumus-box">
-          CF(H,E) = CF(H|E) × CF(E)
+
+        <div
+          style="background: #F0F8FF; border-left: 4px solid #3498DB; padding: 1rem; border-radius: 8px; margin-top: 1.5rem;">
+          <p style="font-size: 0.95rem; margin: 0; color: #1B4F72;">
+            <i class="bi bi-info-circle me-2" style="color: #3498DB;"></i>
+            <strong>Tip:</strong> Semakin tepat Anda menentukan gejala dan keyakinan, semakin akurat hasil diagnosanya.
+          </p>
         </div>
-        <div class="rumus-box">
-          CF_gabung = CF₁ + CF₂ × (1 − CF₁)
-        </div>
-        <small class="text-muted">CF(H|E) = keyakinan pakar &nbsp;|&nbsp; CF(E) = keyakinan pengguna</small>
       </div>
     </div>
 
     <!-- Loading -->
     <div id="loading">
       <div class="spinner-border spinner-green mb-3" role="status"></div>
-      <p class="text-muted">Menghitung Certainty Factor…</p>
+      <p>Menganalisis gejala Anda…</p>
     </div>
 
     <!-- Hasil diagnosis -->
     <div id="hasil-panel" style="display:none">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <h5 class="mb-0"><i class="bi bi-clipboard-data me-2 text-success"></i>Hasil Diagnosis</h5>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0"><i class="bi bi-clipboard-data me-2 text-success"></i>Hasil Analisis</h5>
         <button class="btn btn-sm btn-outline-secondary" onclick="resetSemua()">
           <i class="bi bi-arrow-counterclockwise me-1"></i>Ulangi
         </button>
       </div>
-      <div id="gejala-summary" class="alert alert-success py-2 px-3 mb-3" style="font-size:.88rem"></div>
+      <div id="gejala-summary" class="alert alert-success py-3 px-4 mb-3" style="font-size: 1rem;"></div>
       <div id="hasil-list"></div>
     </div>
   </div>
@@ -154,7 +161,8 @@
   }
 
   function updateCFLabel(id, val) {
-    document.getElementById('cf-val-' + id).textContent = val + ' (' + Math.round(val * 100) + '%)';
+    const percent = Math.round(val * 100);
+    document.getElementById('cf-val-' + id).textContent = percent + '%';
     if (selected[id] !== undefined) selected[id] = parseFloat(val);
   }
 
@@ -203,53 +211,60 @@
 
     // Summary gejala
     const namaGejala = data.gejala_terpilih.map(g => g.nama).join(', ');
-    summary.innerHTML = `<i class="bi bi-check2-circle me-1"></i><strong>${data.total_gejala} gejala</strong> dipilih: ${namaGejala}`;
+    summary.innerHTML = `<i class="bi bi-check-circle-fill me-2"></i><strong>${data.total_gejala} gejala</strong> terdeteksi: ${namaGejala}`;
 
     if (!data.hasil || data.hasil.length === 0) {
       list.innerHTML = `<div class="alert alert-warning">
-      <i class="bi bi-exclamation-triangle me-2"></i>
-      Tidak ditemukan penyakit yang cocok dengan gejala yang dipilih.
+      <i class="bi bi-exclamation-circle me-2"></i>
+      <strong>Hasil Analisis:</strong> Gejala yang Anda pilih tidak cocok dengan penyakit utama dalam basis pengetahuan. Silakan periksa kembali gejala atau konsultasikan dengan ahli pertanian lokal.
     </div>`;
     } else {
 
       list.innerHTML = '';
       data.hasil.forEach((item, idx) => {
-        const rankClass = idx === 0 ? 'rank1' : idx === 1 ? 'rank2' : idx === 2 ? 'rank3' : 'other';
         const rankIcon = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
         const pct = Math.min(item.persentase, 100);
         const warnaCls = { danger: 'danger', warning: 'warning', info: 'info', primary: 'success', secondary: 'secondary' }[item.tingkat.warna] || 'secondary';
+        const warnaHeader = item.tingkat.warna;
 
         list.innerHTML += `
       <div class="hasil-card">
-        <div class="hasil-header ${rankClass}">
-          <span style="font-size:1.1rem; font-weight:700">${rankIcon} ${item.nama}</span>
-          <div class="d-flex align-items-center" style="min-width:120px">
+        <div class="hasil-header bg-${warnaHeader}">
+          <div>
+            <span style="font-size:1.4rem; font-weight:700; margin-right: 0.5rem;">${rankIcon}</span>
+            <span style="font-size:1.2rem; font-weight:700">${item.nama}</span>
+          </div>
+          <div class="d-flex align-items-center gap-2" style="min-width:140px;">
             <div class="cf-bar-wrap">
               <div class="cf-bar" style="width:${pct}%"></div>
             </div>
-            <span style="font-weight:700; white-space:nowrap">${item.persentase}%</span>
+            <span style="font-weight:700; white-space:nowrap; font-size: 1.1rem;">${item.persentase}%</span>
           </div>
         </div>
         <div class="hasil-body">
-          <div class="mb-2">
+          <div class="mb-3">
             <span class="keyakinan-badge bg-${warnaCls} text-white">${item.tingkat.label}</span>
-            <small class="text-muted ms-2"><em>${item.nama_latin}</em></small>
+            <small class="text-muted ms-3"><em style="font-size: 0.95rem;">Nama ilmiah: ${item.nama_latin}</em></small>
           </div>
-          <p class="mb-2" style="font-size:.88rem">${item.deskripsi}</p>
+          <p style="font-size: 1rem; line-height: 1.7; margin-bottom: 1.25rem;">${item.deskripsi}</p>
           <details>
-            <summary style="cursor:pointer; font-weight:600; color:var(--green-dark); font-size:.9rem">
-              <i class="bi bi-clipboard2-pulse me-1"></i>Penanganan & Pencegahan
+            <summary style="cursor:pointer; font-weight:700; color:var(--green-dark); font-size: 1.05rem;">
+              <i class="bi bi-clipboard2-pulse me-2"></i>Penanganan & Pencegahan
             </summary>
-            <div class="mt-2 p-2 rounded" style="background:#f8fdf8; font-size:.85rem">
-              <strong>Penanganan:</strong>
-              <p style="white-space:pre-line; margin-bottom:.5rem">${item.penanganan}</p>
-              <strong>Pencegahan:</strong>
-              <p style="white-space:pre-line; margin-bottom:0">${item.pencegahan}</p>
+            <div class="mt-3 p-3 rounded" style="background:#f8fdf8;">
+              <div style="margin-bottom: 1.5rem;">
+                <h6 style="color: var(--green-dark); font-size: 1.05rem; margin-bottom: 0.75rem;">✓ Penanganan:</h6>
+                <p style="white-space:pre-line; margin-bottom: 0; font-size: 1rem; line-height: 1.7;">${item.penanganan}</p>
+              </div>
+              <div>
+                <h6 style="color: var(--green-dark); font-size: 1.05rem; margin-bottom: 0.75rem;">🛡️ Pencegahan:</h6>
+                <p style="white-space:pre-line; margin-bottom:0; font-size: 1rem; line-height: 1.7;">${item.pencegahan}</p>
+              </div>
             </div>
           </details>
-          <div class="mt-2 text-end">
-            <a href="/penyakit/${item.penyakit_id}" class="btn btn-sm btn-outline-success" target="_blank">
-              <i class="bi bi-arrow-right me-1"></i>Detail Penyakit
+          <div class="mt-3 text-end">
+            <a href="/penyakit/${item.penyakit_id}" class="btn btn-outline-success" target="_blank">
+              <i class="bi bi-arrow-right me-2"></i>Lihat Detail Lengkap
             </a>
           </div>
         </div>
@@ -267,7 +282,7 @@
     document.querySelectorAll('.gejala-item').forEach(el => el.classList.remove('selected'));
     document.querySelectorAll('.cf-slider-wrap').forEach(el => el.classList.remove('show'));
     document.querySelectorAll('.cf-slider').forEach(el => { el.value = 0.8; });
-    document.querySelectorAll('[id^="cf-val-"]').forEach(el => el.textContent = '0.8 (80%)');
+    document.querySelectorAll('[id^="cf-val-"]').forEach(el => el.textContent = '80%');
     updateCounter();
     document.getElementById('hasil-panel').style.display = 'none';
     document.getElementById('info-panel').style.display = 'block';

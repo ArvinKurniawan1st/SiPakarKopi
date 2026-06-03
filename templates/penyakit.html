@@ -4,21 +4,22 @@
 {% block content %}
 <div class="hero-card">
   <h1><i class="bi bi-bug me-2"></i>Daftar Penyakit Tanaman Kopi</h1>
-  <p>Basis pengetahuan sistem pakar — 6 jenis penyakit utama tanaman kopi beserta gejala dan penanganannya.</p>
+  <p>Ketahui 6 penyakit utama yang sering menyerang tanaman kopi beserta gejala, penanganan, dan pencegahannya.</p>
 </div>
 
-<div class="row g-3">
+<div class="row g-4">
   {% for p in penyakit %}
   <div class="col-md-6">
     <div class="card h-100">
       <div class="card-header coffee">
-        <i class="bi bi-virus me-2"></i>{{ p.kode }} — {{ p.nama }}
+        <i class="bi bi-virus me-2"></i><strong>{{ p.kode }}</strong> — {{ p.nama }}
       </div>
       <div class="card-body">
-        <p class="text-muted mb-2" style="font-style:italic; font-size:.88rem">{{ p.nama_latin }}</p>
-        <p style="font-size:.9rem">{{ p.deskripsi[:180] }}…</p>
-        <a href="/penyakit/{{ p.id }}" class="btn btn-sm btn-outline-success">
-          <i class="bi bi-arrow-right me-1"></i>Lihat Detail & Aturan CF
+        <p style="font-style:italic; font-size: 0.95rem; color: #666; margin-bottom: 1rem;">{{ p.nama_latin }}</p>
+        <p style="font-size: 1rem; line-height: 1.7; margin-bottom: 1.5rem;">{{ p.deskripsi[:200] }}{% if
+          p.deskripsi|length > 200 %}…{% endif %}</p>
+        <a href="/penyakit/{{ p.id }}" class="btn btn-outline-success w-100">
+          <i class="bi bi-arrow-right me-2"></i>Lihat Detail Lengkap
         </a>
       </div>
     </div>

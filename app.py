@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, url_for
 from database import db, init_db, sync_penyakit_gambar
 from cf_engine import CertaintyFactorEngine
+from nlp_engine import GejalaNLP
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sistem_pakar.db'
@@ -11,14 +12,22 @@ db.init_app(app)
 
 @app.route('/')
 def index():
+    return render_template('index.html')
+
+@app.route('/chat/nlp', methods=['POST'])
+def chat_nlp():
+    """Chatbot NLP: ekstrak gejala dari teks bahasa Indonesia."""
     from database import Gejala
-    gejala_list = Gejala.query.order_by(Gejala.kategori, Gejala.nama).all()
-    kategori_dict = {}
-    for g in gejala_list:
-        if g.kategori not in kategori_dict:
-            kategori_dict[g.kategori] = []
-        kategori_dict[g.kategori].append(g)
-    return render_template('index.html', kategori_dict=kategori_dict)
+    data = request.get_json() or {}
+    pesan = (data.get('message') or '').strip()
+    session_gejala = data.get('gejala', {})
+
+    gejala_list = Gejala.query.order_by(Gejala.nama).all()
+    nlp = GejalaNLP(gejala_list)
+    hasil = nlp.process_message(pesan, session_gejala)
+
+    return jsonify(hasil)
+
 
 @app.route('/diagnosa', methods=['POST'])
 def diagnosa():
@@ -66,6 +75,7 @@ def diagnosa():
                 'deskripsi': p.deskripsi,
                 'penanganan': p.penanganan,
                 'pencegahan': p.pencegahan,
+                'gambar_url': url_for('static', filename=p.gambar) if p.gambar else None,
                 'tingkat': engine.tingkat_keyakinan(cf_total),
                 'status': 'Mendukung' if cf_total > 0 else 'Menolak'
             })

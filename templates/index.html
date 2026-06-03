@@ -5,9 +5,9 @@
 <div class="hero-card">
   <div class="row align-items-center">
     <div class="col-md-8">
-      <h1><i class="bi bi-clipboard-pulse me-2"></i>Diagnosa Penyakit Tanaman Kopi</h1>
-      <p>Amati tanaman kopi Anda, pilih gejala yang terlihat, lalu sistem akan menganalisis kemungkinan penyakitnya
-        menggunakan teknologi Certainty Factor.</p>
+      <h1><i class="bi bi-chat-dots me-2"></i>Diagnosa Penyakit Tanaman Kopi</h1>
+      <p>Ceritakan gejala yang Anda lihat dalam bahasa sehari-hari. SiPakar akan mengekstrak gejala
+        secara otomatis, lalu sistem menganalisisnya dengan metode <strong>Certainty Factor</strong>.</p>
     </div>
     <div class="col-md-4 text-end d-none d-md-block">
       <span style="font-size:6rem; opacity:.2">☕</span>
@@ -16,73 +16,47 @@
 </div>
 
 <div class="row g-4">
-  <!-- Kolom Kiri: Pilih Gejala -->
+  <!-- Kolom Kiri: Chatbot NLP -->
   <div class="col-lg-7">
-    <div class="card mb-3">
+    <div class="card chat-card mb-3">
       <div class="card-header">
         <div class="d-flex align-items-center justify-content-between">
-          <div><i class="bi bi-list-check me-2"></i>Pilih Gejala yang Anda Lihat</div>
-          <span class="badge bg-light text-dark" id="counter">0 dipilih</span>
+          <div><i class="bi bi-robot me-2"></i>Asisten SiPakar</div>
+          <span class="badge bg-light text-dark" id="counter">0 gejala</span>
         </div>
       </div>
-      <div class="card-body">
-        <!-- Filter kategori -->
-        <div class="mb-4 d-flex gap-2 flex-wrap">
-          <button class="btn btn-sm filter-btn active" data-cat="semua" onclick="filterKat(this)"
-            style="font-weight: 600;">Semua Gejala</button>
-          <button class="btn btn-sm filter-btn" data-cat="daun" onclick="filterKat(this)"><span
-              class="badge-kategori kat-daun">🌿 Daun</span></button>
-          <button class="btn btn-sm filter-btn" data-cat="buah" onclick="filterKat(this)"><span
-              class="badge-kategori kat-buah">🍒 Buah</span></button>
-          <button class="btn btn-sm filter-btn" data-cat="batang" onclick="filterKat(this)"><span
-              class="badge-kategori kat-batang">🌳 Batang</span></button>
-          <button class="btn btn-sm filter-btn" data-cat="akar" onclick="filterKat(this)"><span
-              class="badge-kategori kat-akar">🌱 Akar</span></button>
-          <button class="btn btn-sm filter-btn" data-cat="umum" onclick="filterKat(this)"><span
-              class="badge-kategori kat-umum">📋 Umum</span></button>
-        </div>
-
-        <!-- Daftar gejala per kategori -->
-        {% for kat, gejala_list in kategori_dict.items() %}
-        <div class="mb-4 kat-section" data-kat="{{ kat }}">
-          <div class="d-flex align-items-center mb-3">
-            {% if kat == 'daun' %}<span class="badge-kategori kat-daun me-2">🌿 Gejala Daun</span>
-            {% elif kat == 'buah' %}<span class="badge-kategori kat-buah me-2">🍒 Gejala Buah</span>
-            {% elif kat == 'batang' %}<span class="badge-kategori kat-batang me-2">🌳 Gejala Batang & Ranting</span>
-            {% elif kat == 'akar' %}<span class="badge-kategori kat-akar me-2">🌱 Gejala Akar</span>
-            {% else %}<span class="badge-kategori kat-umum me-2">📋 Gejala Umum</span>{% endif %}
+      <div class="card-body p-0 d-flex flex-column">
+        <div class="chat-messages" id="chat-messages" aria-live="polite"></div>
+        <div class="chat-input-wrap">
+          <div class="input-group">
+            <input type="text" class="form-control" id="chat-input"
+              placeholder="Contoh: daun bercak kuning oranye dan sering rontok…" autocomplete="off" maxlength="500">
+            <button class="btn btn-success" type="button" onclick="kirimPesan()" id="btn-kirim" title="Kirim pesan">
+              <i class="bi bi-send-fill"></i>
+            </button>
           </div>
-          {% for g in gejala_list %}
-          <div class="gejala-item" id="item-{{ g.id }}" onclick="toggleGejala({{ g.id }}, event)">
-            <div class="d-flex align-items-start">
-              <input type="checkbox" id="cb-{{ g.id }}" value="{{ g.id }}" class="gejala-cb"
-                onclick="event.stopPropagation()">
-              <label for="cb-{{ g.id }}" onclick="event.stopPropagation()">
-                {{ g.nama }}
-              </label>
-            </div>
-            <!-- Slider CF User -->
-            <div class="cf-slider-wrap" id="slider-{{ g.id }}">
-              <div class="d-flex justify-content-between mb-2">
-                <small class="cf-label">Seberapa yakin Anda?</small>
-                <small class="cf-label" id="cf-val-{{ g.id }}">80%</small>
-              </div>
-              <input type="range" class="cf-slider" id="range-{{ g.id }}" min="0.1" max="1.0" step="0.1" value="0.8"
-                oninput="updateCFLabel({{ g.id }}, this.value)" onclick="event.stopPropagation()">
-              <div class="d-flex justify-content-between mt-2"
-                style="font-size: 0.9rem; color: #666; font-weight: 500;">
-                <span>Tidak yakin</span>
-                <span>Sangat yakin</span>
-              </div>
-            </div>
+          <div class="chat-quick mt-2 d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary"
+              onclick="quickPesan('daun bercak kuning oranye dan daun rontok')">Contoh karat</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary"
+              onclick="quickPesan('buah membusuk dan cabang kering')">Contoh antraknosa</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary"
+              onclick="kirimPerintah('bantuan')">Bantuan</button>
           </div>
-          {% endfor %}
         </div>
-        {% endfor %}
       </div>
     </div>
 
-    <!-- Tombol aksi -->
+    <!-- Gejala terdeteksi dari NLP -->
+    <div class="card mb-3" id="gejala-panel" style="display:none">
+      <div class="card-header" style="background: linear-gradient(135deg, #2D6A4F, #40916C);">
+        <i class="bi bi-tags me-2"></i>Gejala Terdeteksi
+      </div>
+      <div class="card-body py-3">
+        <div id="gejala-chips" class="d-flex flex-wrap gap-2"></div>
+      </div>
+    </div>
+
     <div class="d-flex gap-2">
       <button class="btn btn-diagnosa flex-grow-1" onclick="jalankanDiagnosa()" id="btn-diagnosa" disabled>
         <i class="bi bi-search me-2"></i>Jalankan Diagnosa
@@ -93,38 +67,26 @@
     </div>
   </div>
 
-  <!-- Kolom Kanan: Hasil + Info CF -->
+  <!-- Kolom Kanan: Hasil + Panduan -->
   <div class="col-lg-5">
-    <!-- Petunjuk -->
     <div class="card mb-3" id="info-panel">
-      <div class="card-header"><i class="bi bi-lightbulb me-2"></i>Panduan Penggunaan</div>
+      <div class="card-header"><i class="bi bi-lightbulb me-2"></i>Panduan Bertanya SiPakar</div>
       <div class="card-body">
         <ol style="font-size: 1rem; line-height: 2; padding-left: 1.5rem;">
-          <li style="margin-bottom: 0.75rem;"><strong>Amati tanaman Anda</strong> dengan teliti.</li>
-          <li style="margin-bottom: 0.75rem;">Centang gejala yang <strong>benar-benar terlihat</strong> pada tanaman.
-          </li>
-          <li style="margin-bottom: 0.75rem;">Untuk setiap gejala, atur <strong>tingkat keyakinan Anda</strong>
-            menggunakan slider.</li>
-          <li style="margin-bottom: 0.75rem;">Klik tombol <strong>"Jalankan Diagnosa"</strong> untuk melihat hasil.</li>
+          <li style="margin-bottom: 0.75rem;"><strong>Amati tanaman</strong> dan ketik gejala yang terlihat.</li>
+          <li style="margin-bottom: 0.75rem;">Sistem <strong>mengekstrak gejala</strong> dari kalimat Anda (tokenisasi &
+            pencocokan sinonim).</li>
+          <li style="margin-bottom: 0.75rem;">Tambahkan gejala lain jika perlu, lalu klik <strong>Jalankan
+              Diagnosa</strong> atau ketik <em>diagnosa</em>.</li>
         </ol>
-
-        <div
-          style="background: #F0F8FF; border-left: 4px solid #3498DB; padding: 1rem; border-radius: 8px; margin-top: 1.5rem;">
-          <p style="font-size: 0.95rem; margin: 0; color: #1B4F72;">
-            <i class="bi bi-info-circle me-2" style="color: #3498DB;"></i>
-            <strong>Tip:</strong> Semakin tepat Anda menentukan gejala dan keyakinan, semakin akurat hasil diagnosanya.
-          </p>
-        </div>
       </div>
     </div>
 
-    <!-- Loading -->
     <div id="loading">
       <div class="spinner-border spinner-green mb-3" role="status"></div>
       <p>Menganalisis gejala Anda…</p>
     </div>
 
-    <!-- Hasil diagnosis -->
     <div id="hasil-panel" style="display:none">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="mb-0"><i class="bi bi-clipboard-data me-2 text-success"></i>Hasil Analisis</h5>
@@ -141,44 +103,118 @@
 
 {% block extra_js %}
 <script>
-  let selected = {};  // {gejala_id: cf_user}
+  let selected = {};  // {gejala_id: cf_user} — dari NLP
+  let gejalaTercatat = [];
 
-  function toggleGejala(id, e) {
-    const cb = document.getElementById('cb-' + id);
-    const item = document.getElementById('item-' + id);
-    const slider = document.getElementById('slider-' + id);
-    cb.checked = !cb.checked;
-    if (cb.checked) {
-      item.classList.add('selected');
-      slider.classList.add('show');
-      selected[id] = parseFloat(document.getElementById('range-' + id).value);
-    } else {
-      item.classList.remove('selected');
-      slider.classList.remove('show');
-      delete selected[id];
-    }
-    updateCounter();
+  const WELCOME = `Halo! Saya asisten <strong>SiPakar Kopi</strong>. Ceritakan gejala pada tanaman kopi Anda — misalnya <em>"daun bercak kuning dan rontok"</em>. Ketik <strong>bantuan</strong> untuk panduan.`;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    tambahBubble('bot', WELCOME);
+    document.getElementById('chat-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); kirimPesan(); }
+    });
+  });
+
+  function tambahBubble(role, html) {
+    const box = document.getElementById('chat-messages');
+    const div = document.createElement('div');
+    div.className = 'chat-bubble ' + (role === 'user' ? 'chat-user' : 'chat-bot');
+    div.innerHTML = role === 'user' ? escapeHtml(html) : html;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
   }
 
-  function updateCFLabel(id, val) {
-    const percent = Math.round(val * 100);
-    document.getElementById('cf-val-' + id).textContent = percent + '%';
-    if (selected[id] !== undefined) selected[id] = parseFloat(val);
+  function escapeHtml(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
   }
 
   function updateCounter() {
     const n = Object.keys(selected).length;
-    document.getElementById('counter').textContent = n + ' dipilih';
+    document.getElementById('counter').textContent = n + ' gejala';
     document.getElementById('btn-diagnosa').disabled = n === 0;
   }
 
-  function filterKat(btn) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active', 'btn-success'));
-    btn.classList.add('active');
-    const cat = btn.dataset.cat;
-    document.querySelectorAll('.kat-section').forEach(sec => {
-      sec.style.display = (cat === 'semua' || sec.dataset.kat === cat) ? '' : 'none';
-    });
+  function renderChips(semua) {
+    const panel = document.getElementById('gejala-panel');
+    const chips = document.getElementById('gejala-chips');
+    if (!semua || semua.length === 0) {
+      panel.style.display = 'none';
+      chips.innerHTML = '';
+      return;
+    }
+    panel.style.display = 'block';
+    chips.innerHTML = semua.map(g => `
+      <span class="gejala-chip" title="Keyakinan ${Math.round(g.cf_user * 100)}%">
+        ${escapeHtml(g.nama)}
+        <small class="ms-1 opacity-75">${Math.round(g.cf_user * 100)}%</small>
+        <button type="button" class="chip-remove" onclick="hapusGejala(${g.id})" aria-label="Hapus">&times;</button>
+      </span>
+    `).join('');
+  }
+
+  function hapusGejala(id) {
+    delete selected[id];
+    delete selected[String(id)];
+    gejalaTercatat = gejalaTercatat.filter(g => g.id !== id);
+    updateCounter();
+    renderChips(gejalaTercatat);
+    tambahBubble('bot', `Gejala dihapus. Total tercatat: <strong>${Object.keys(selected).length}</strong> gejala.`);
+  }
+
+  async function kirimPesan() {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    await prosesChat(text);
+  }
+
+  function quickPesan(text) {
+    document.getElementById('chat-input').value = text;
+    kirimPesan();
+  }
+
+  function kirimPerintah(cmd) {
+    document.getElementById('chat-input').value = cmd;
+    kirimPesan();
+  }
+
+  async function prosesChat(text) {
+    tambahBubble('user', text);
+    document.getElementById('btn-kirim').disabled = true;
+
+    try {
+      const res = await fetch('/chat/nlp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, gejala: selected })
+      });
+      const data = await res.json();
+
+      if (data.intent === 'reset') {
+        selected = {};
+      } else if (data.session_gejala) {
+        selected = {};
+        for (const [k, v] of Object.entries(data.session_gejala)) {
+          selected[k] = v;
+        }
+      }
+
+      gejalaTercatat = data.semua || [];
+      updateCounter();
+      renderChips(gejalaTercatat);
+      tambahBubble('bot', data.reply || '…');
+
+      if (data.siap_diagnosa) {
+        await jalankanDiagnosa();
+      }
+    } catch (err) {
+      tambahBubble('bot', 'Maaf, terjadi kesalahan. Coba lagi.');
+    } finally {
+      document.getElementById('btn-kirim').disabled = false;
+    }
   }
 
   async function jalankanDiagnosa() {
@@ -195,12 +231,16 @@
         body: JSON.stringify({ gejala: selected })
       });
       const data = await res.json();
+      if (data.error) {
+        tambahBubble('bot', data.error);
+        return;
+      }
       tampilkanHasil(data);
     } catch (err) {
       alert('Terjadi kesalahan: ' + err.message);
     } finally {
       document.getElementById('loading').style.display = 'none';
-      document.getElementById('btn-diagnosa').disabled = false;
+      document.getElementById('btn-diagnosa').disabled = Object.keys(selected).length === 0;
     }
   }
 
@@ -209,17 +249,15 @@
     const list = document.getElementById('hasil-list');
     const summary = document.getElementById('gejala-summary');
 
-    // Summary gejala
     const namaGejala = data.gejala_terpilih.map(g => g.nama).join(', ');
-    summary.innerHTML = `<i class="bi bi-check-circle-fill me-2"></i><strong>${data.total_gejala} gejala</strong> terdeteksi: ${namaGejala}`;
+    summary.innerHTML = `<i class="bi bi-check-circle-fill me-2"></i><strong>${data.total_gejala} gejala</strong>: ${namaGejala}`;
 
     if (!data.hasil || data.hasil.length === 0) {
       list.innerHTML = `<div class="alert alert-warning">
       <i class="bi bi-exclamation-circle me-2"></i>
-      <strong>Hasil Analisis:</strong> Gejala yang Anda pilih tidak cocok dengan penyakit utama dalam basis pengetahuan. Silakan periksa kembali gejala atau konsultasikan dengan ahli pertanian lokal.
+      <strong>Hasil Analisis:</strong> Gejala yang terdeteksi tidak cocok dengan basis pengetahuan. Coba jelaskan gejala lain atau konsultasikan ahli pertanian.
     </div>`;
     } else {
-
       list.innerHTML = '';
       data.hasil.forEach((item, idx) => {
         const rankIcon = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
@@ -246,7 +284,15 @@
             <span class="keyakinan-badge bg-${warnaCls} text-white">${item.tingkat.label}</span>
             <small class="text-muted ms-3"><em style="font-size: 0.95rem;">Nama ilmiah: ${item.nama_latin}</em></small>
           </div>
-          <p style="font-size: 1rem; line-height: 1.7; margin-bottom: 1.25rem;">${item.deskripsi}</p>
+          <p style="font-size: 1rem; line-height: 1.7; margin-bottom: 1rem;">${item.deskripsi}</p>
+          ${item.gambar_url ? `
+          <div class="penyakit-gambar-wrap mb-3 overflow-hidden rounded border">
+            <img src="${item.gambar_url}" alt="Ilustrasi gejala ${item.nama}" class="w-100"
+              style="max-height: 260px; object-fit: cover; display: block;">
+            <div class="py-2 px-3" style="background: #f8f9fa;">
+              <small class="text-muted">Contoh gejala hasil diagnosa</small>
+            </div>
+          </div>` : ''}
           <details>
             <summary style="cursor:pointer; font-weight:700; color:var(--green-dark); font-size: 1.05rem;">
               <i class="bi bi-clipboard2-pulse me-2"></i>Penanganan & Pencegahan
@@ -278,48 +324,85 @@
 
   function resetSemua() {
     selected = {};
-    document.querySelectorAll('.gejala-cb').forEach(cb => cb.checked = false);
-    document.querySelectorAll('.gejala-item').forEach(el => el.classList.remove('selected'));
-    document.querySelectorAll('.cf-slider-wrap').forEach(el => el.classList.remove('show'));
-    document.querySelectorAll('.cf-slider').forEach(el => { el.value = 0.8; });
-    document.querySelectorAll('[id^="cf-val-"]').forEach(el => el.textContent = '80%');
+    gejalaTercatat = [];
     updateCounter();
+    renderChips([]);
+    document.getElementById('chat-messages').innerHTML = '';
+    tambahBubble('bot', WELCOME);
     document.getElementById('hasil-panel').style.display = 'none';
     document.getElementById('info-panel').style.display = 'block';
-    document.querySelectorAll('.kat-section').forEach(s => s.style.display = '');
-    document.querySelectorAll('.filter-btn').forEach((b, i) => { if (i === 0) b.classList.add('active'); else b.classList.remove('active'); });
+    document.getElementById('chat-input').value = '';
   }
-
-  // Sync checkbox via label click
-  document.querySelectorAll('.gejala-cb').forEach(cb => {
-    cb.addEventListener('change', function () {
-      const id = parseInt(this.value);
-      const item = document.getElementById('item-' + id);
-      const slider = document.getElementById('slider-' + id);
-      if (this.checked) {
-        item.classList.add('selected');
-        slider.classList.add('show');
-        selected[id] = parseFloat(document.getElementById('range-' + id).value);
-      } else {
-        item.classList.remove('selected');
-        slider.classList.remove('show');
-        delete selected[id];
-      }
-      updateCounter();
-    });
-  });
 </script>
 <style>
-  .filter-btn {
-    border-radius: 20px;
-    border: 1.5px solid #ccc;
-    background: white;
-    transition: all .15s;
+  .chat-card {
+    min-height: 420px;
   }
 
-  .filter-btn.active {
-    border-color: var(--green-mid);
+  .chat-messages {
+    flex: 1;
+    min-height: 280px;
+    max-height: 380px;
+    overflow-y: auto;
+    padding: 1.25rem;
+    background: #f4f7f5;
+  }
+
+  .chat-bubble {
+    max-width: 88%;
+    padding: 0.85rem 1.1rem;
+    border-radius: 14px;
+    margin-bottom: 0.75rem;
+    font-size: 0.98rem;
+    line-height: 1.55;
+  }
+
+  .chat-bot {
+    background: white;
+    border: 1px solid #e0e8e3;
+    border-bottom-left-radius: 4px;
+    margin-right: auto;
+    color: #2c3e50;
+  }
+
+  .chat-user {
+    background: linear-gradient(135deg, var(--green-mid), var(--green-dark));
+    color: white;
+    margin-left: auto;
+    border-bottom-right-radius: 4px;
+  }
+
+  .chat-input-wrap {
+    padding: 1rem 1.25rem 1.25rem;
+    border-top: 1px solid #e8ece9;
+    background: white;
+  }
+
+  .gejala-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
     background: var(--green-pale);
+    color: var(--green-dark);
+    border: 1px solid var(--green-light);
+    border-radius: 20px;
+    padding: 0.35rem 0.5rem 0.35rem 0.85rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .chip-remove {
+    border: none;
+    background: transparent;
+    color: #666;
+    font-size: 1.2rem;
+    line-height: 1;
+    padding: 0 0.35rem;
+    cursor: pointer;
+  }
+
+  .chip-remove:hover {
+    color: #c0392b;
   }
 
   details summary::-webkit-details-marker {

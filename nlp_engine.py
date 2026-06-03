@@ -1,7 +1,3 @@
-"""
-Modul NLP ringan untuk mengekstrak gejala dari teks bahasa Indonesia.
-Menggunakan pencocokan frasa, sinonim, dan fuzzy matching (tanpa dependensi ML berat).
-"""
 import re
 import unicodedata
 from difflib import SequenceMatcher
@@ -14,7 +10,6 @@ STOPWORDS = {
     'punya', 'memiliki', 'adalah', 'akan', 'telah', 'begini', 'begitu', 'nya',
 }
 
-# Sinonim / frasa alternatif per kode gejala (dari database)
 GEJALA_SINONIM = {
     'G001': ['daun menguning', 'daun kuning', 'menguning', 'warna kuning daun'],
     'G002': ['bercak kuning', 'bercak oranye', 'bercak orange', 'karat daun', 'noda oranye', 'bercak karat'],
@@ -78,8 +73,6 @@ def _tokens(text: str) -> set:
 
 
 class GejalaNLP:
-    """Ekstrak gejala dari kalimat pengguna."""
-
     def __init__(self, gejala_list):
         """
         gejala_list: iterable of objects/dicts with id, kode, nama, kategori
@@ -112,26 +105,25 @@ class GejalaNLP:
             return 0.0
         if variant in text_norm:
             return 0.92
-        # frasa multi-kata: semua kata harus ada
+
         v_words = variant.split()
         if len(v_words) >= 2:
             if all(w in text_norm for w in v_words):
                 return 0.85
-        # overlap token
+
         t_set = set(text_norm.split())
         v_set = set(v_words)
         if v_set:
             overlap = len(v_set & t_set) / len(v_set)
             if overlap >= 0.75:
                 return 0.72 + overlap * 0.15
-        # fuzzy pada potongan teks
+
         ratio = SequenceMatcher(None, variant, text_norm).ratio()
         if ratio >= 0.72:
             return ratio * 0.8
         return 0.0
 
     def extract(self, text: str, min_score: float = 0.68) -> list:
-        """Kembalikan daftar gejala yang terdeteksi beserta skor keyakinan."""
         if not text or not text.strip():
             return []
 

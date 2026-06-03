@@ -47,6 +47,18 @@
   </div>
 
   <div class="col-lg-4">
+    {% if penyakit.gambar %}
+    <div class="card mb-4 overflow-hidden">
+      <img src="{{ url_for('static', filename=penyakit.gambar) }}"
+        alt="Ilustrasi gejala {{ penyakit.nama }}"
+        class="w-100"
+        style="max-height: 260px; object-fit: cover; display: block;">
+      <div class="card-body py-2 px-3" style="background: #f8f9fa;">
+        <small class="text-muted"><i class="bi bi-image me-1"></i>Contoh gejala khas: {{ penyakit.nama }}</small>
+      </div>
+    </div>
+    {% endif %}
+
     <div class="card mb-4">
       <div class="card-header">
         <i class="bi bi-list-check me-2"></i>Gejala yang Khas

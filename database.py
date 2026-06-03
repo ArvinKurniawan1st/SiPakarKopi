@@ -49,12 +49,52 @@ class RiwayatDiagnosis(db.Model):
 
 
 # ─────────────────────────────────────────────
+# GAMBAR PENYAKIT (relatif ke folder static/)
+# ─────────────────────────────────────────────
+
+PENYAKIT_GAMBAR = {
+    'P001': 'images/bercak Bercak kuningoranye.jpg',
+    'P002': 'images/bercak coklat.jpg',
+    'P003': 'images/Buah membusuk.jpg',
+    'P004': 'images/Ada jamur putih.png',
+    'P005': 'images/Akar membusuk.jpg',
+    'P006': 'images/Batang lunak.jpg',
+    'P007': 'images/Daun bertepung putih.jpg',
+    'P008': 'images/Cabang membusuk.jpg',
+    'P009': 'images/Daun menghitam.jpg',
+    'P010': 'images/Bercak basah.jpg',
+    'P011': 'images/Akar bengkak.jpg',
+    'P012': 'images/Layu permanen.jpg',
+    'P013': 'images/Daun pucat.jpg',
+    'P014': 'images/Daun tepi coklat.jpg',
+    'P015': 'images/Daun kuning di tengah.jpg',
+    'P016': 'images/Tanaman layu.jpg',
+    'P017': 'images/Akar membusuk.jpg',
+    'P018': 'images/Akar rusak.jpg',
+    'P019': 'images/Produksi menurun.png',
+}
+
+
+def sync_penyakit_gambar():
+    """Isi kolom gambar untuk data penyakit yang sudah ada di database."""
+    updated = False
+    for p in Penyakit.query.all():
+        path = PENYAKIT_GAMBAR.get(p.kode)
+        if path and p.gambar != path:
+            p.gambar = path
+            updated = True
+    if updated:
+        db.session.commit()
+
+
+# ─────────────────────────────────────────────
 # SEED DATA
 # ─────────────────────────────────────────────
 
 def init_db():
     # Hanya seed jika database kosong
     if Penyakit.query.count() > 0:
+        sync_penyakit_gambar()
         return
 
     # ── PENYAKIT ──────────────────────────────
@@ -65,7 +105,8 @@ def init_db():
             'nama_latin': 'Hemileia vastatrix',
             'deskripsi': 'Penyakit jamur yang menyerang daun kopi dengan bercak kuning/oranye dan menyebabkan defoliasi.',
             'penanganan': 'Semprot fungisida berbahan tembaga, pangkas daun terinfeksi, perbaiki sirkulasi udara.',
-            'pencegahan': 'Gunakan varietas tahan, lakukan monitoring rutin, jaga sanitasi kebun.'
+            'pencegahan': 'Gunakan varietas tahan, lakukan monitoring rutin, jaga sanitasi kebun.',
+            'gambar': PENYAKIT_GAMBAR['P001'],
         },
         {
             'kode': 'P002',
@@ -73,7 +114,8 @@ def init_db():
             'nama_latin': 'Cercospora coffeicola',
             'deskripsi': 'Penyakit bercak daun yang menyebabkan bercak coklat dan penurunan kualitas tanaman.',
             'penanganan': 'Gunakan fungisida mankozeb/karbendazim, kurangi nitrogen berlebih.',
-            'pencegahan': 'Pemupukan seimbang, sanitasi kebun, drainase baik.'
+            'pencegahan': 'Pemupukan seimbang, sanitasi kebun, drainase baik.',
+            'gambar': PENYAKIT_GAMBAR['P002'],
         },
         {
             'kode': 'P003',
@@ -81,7 +123,8 @@ def init_db():
             'nama_latin': 'Colletotrichum gloeosporioides',
             'deskripsi': 'Menyerang buah dan ranting, menyebabkan busuk buah dan kematian cabang.',
             'penanganan': 'Semprot fungisida, buang bagian terinfeksi.',
-            'pencegahan': 'Sanitasi kebun dan panen tepat waktu.'
+            'pencegahan': 'Sanitasi kebun dan panen tepat waktu.',
+            'gambar': PENYAKIT_GAMBAR['P003'],
         },
         {
             'kode': 'P004',
@@ -89,7 +132,8 @@ def init_db():
             'nama_latin': 'Upasia salmonicolor',
             'deskripsi': 'Jamur yang menyerang cabang dan batang dengan miselium putih.',
             'penanganan': 'Pangkas cabang terinfeksi dan bakar.',
-            'pencegahan': 'Jaga kelembaban dan sirkulasi udara.'
+            'pencegahan': 'Jaga kelembaban dan sirkulasi udara.',
+            'gambar': PENYAKIT_GAMBAR['P004'],
         },
         {
             'kode': 'P005',
@@ -97,7 +141,8 @@ def init_db():
             'nama_latin': 'Fusarium spp. / Phytophthora spp.',
             'deskripsi': 'Penyakit pada akar yang menyebabkan tanaman layu dan mati.',
             'penanganan': 'Gunakan fungisida tanah dan perbaiki drainase.',
-            'pencegahan': 'Gunakan bibit sehat dan hindari genangan.'
+            'pencegahan': 'Gunakan bibit sehat dan hindari genangan.',
+            'gambar': PENYAKIT_GAMBAR['P005'],
         },
         {
             'kode': 'P006',
@@ -105,7 +150,8 @@ def init_db():
             'nama_latin': 'Phytophthora spp.',
             'deskripsi': 'Batang menjadi lunak dan menghitam akibat infeksi jamur.',
             'penanganan': 'Potong bagian terinfeksi dan aplikasikan fungisida.',
-            'pencegahan': 'Hindari kelembaban tinggi berlebih.'
+            'pencegahan': 'Hindari kelembaban tinggi berlebih.',
+            'gambar': PENYAKIT_GAMBAR['P006'],
         },
         {
             'kode': 'P007',
@@ -113,7 +159,8 @@ def init_db():
             'nama_latin': 'Oidium spp.',
             'deskripsi': 'Ditandai dengan lapisan putih seperti tepung pada daun.',
             'penanganan': 'Gunakan fungisida sulfur.',
-            'pencegahan': 'Kurangi kelembaban dan tingkatkan sirkulasi udara.'
+            'pencegahan': 'Kurangi kelembaban dan tingkatkan sirkulasi udara.',
+            'gambar': PENYAKIT_GAMBAR['P007'],
         },
         {
             'kode': 'P008',
@@ -121,7 +168,8 @@ def init_db():
             'nama_latin': 'Botryodiplodia spp.',
             'deskripsi': 'Cabang membusuk dan mudah patah.',
             'penanganan': 'Pangkas dan bakar cabang terinfeksi.',
-            'pencegahan': 'Jaga kesehatan tanaman.'
+            'pencegahan': 'Jaga kesehatan tanaman.',
+            'gambar': PENYAKIT_GAMBAR['P008'],
         },
         {
             'kode': 'P009',
@@ -129,7 +177,8 @@ def init_db():
             'nama_latin': 'Xanthomonas spp.',
             'deskripsi': 'Penyakit bakteri yang menyebabkan daun layu dan menghitam.',
             'penanganan': 'Gunakan bakterisida.',
-            'pencegahan': 'Hindari percikan air berlebih.'
+            'pencegahan': 'Hindari percikan air berlebih.',
+            'gambar': PENYAKIT_GAMBAR['P009'],
         },
         {
             'kode': 'P010',
@@ -137,7 +186,8 @@ def init_db():
             'nama_latin': 'Pseudomonas spp.',
             'deskripsi': 'Menimbulkan bercak basah pada daun.',
             'penanganan': 'Semprot bakterisida.',
-            'pencegahan': 'Sanitasi kebun.'
+            'pencegahan': 'Sanitasi kebun.',
+            'gambar': PENYAKIT_GAMBAR['P010'],
         },
         {
             'kode': 'P011',
@@ -145,7 +195,8 @@ def init_db():
             'nama_latin': 'Meloidogyne spp.',
             'deskripsi': 'Menyerang akar dan menyebabkan pembengkakan.',
             'penanganan': 'Gunakan nematisida.',
-            'pencegahan': 'Rotasi tanaman.'
+            'pencegahan': 'Rotasi tanaman.',
+            'gambar': PENYAKIT_GAMBAR['P011'],
         },
         {
             'kode': 'P012',
@@ -153,7 +204,8 @@ def init_db():
             'nama_latin': 'Fusarium oxysporum',
             'deskripsi': 'Menyebabkan layu permanen akibat kerusakan pembuluh.',
             'penanganan': 'Cabut tanaman terinfeksi.',
-            'pencegahan': 'Gunakan bibit tahan penyakit.'
+            'pencegahan': 'Gunakan bibit tahan penyakit.',
+            'gambar': PENYAKIT_GAMBAR['P012'],
         },
         {
             'kode': 'P013',
@@ -161,7 +213,8 @@ def init_db():
             'nama_latin': '-',
             'deskripsi': 'Kekurangan nitrogen menyebabkan daun pucat dan pertumbuhan lambat.',
             'penanganan': 'Tambahkan pupuk nitrogen.',
-            'pencegahan': 'Pemupukan rutin.'
+            'pencegahan': 'Pemupukan rutin.',
+            'gambar': PENYAKIT_GAMBAR['P013'],
         },
         {
             'kode': 'P014',
@@ -169,7 +222,8 @@ def init_db():
             'nama_latin': '-',
             'deskripsi': 'Ditandai dengan daun tepi coklat dan kering.',
             'penanganan': 'Tambahkan pupuk kalium.',
-            'pencegahan': 'Pemupukan berimbang.'
+            'pencegahan': 'Pemupukan berimbang.',
+            'gambar': PENYAKIT_GAMBAR['P014'],
         },
         {
             'kode': 'P015',
@@ -177,7 +231,8 @@ def init_db():
             'nama_latin': '-',
             'deskripsi': 'Daun menguning di bagian tengah.',
             'penanganan': 'Berikan dolomit atau Mg.',
-            'pencegahan': 'Perbaiki pH tanah.'
+            'pencegahan': 'Perbaiki pH tanah.',
+            'gambar': PENYAKIT_GAMBAR['P015'],
         },
         {
             'kode': 'P016',
@@ -185,7 +240,8 @@ def init_db():
             'nama_latin': '-',
             'deskripsi': 'Tanaman layu akibat kekurangan air.',
             'penanganan': 'Lakukan penyiraman rutin.',
-            'pencegahan': 'Gunakan mulsa.'
+            'pencegahan': 'Gunakan mulsa.',
+            'gambar': PENYAKIT_GAMBAR['P016'],
         },
         {
             'kode': 'P017',
@@ -193,7 +249,8 @@ def init_db():
             'nama_latin': '-',
             'deskripsi': 'Kelebihan air menyebabkan akar busuk.',
             'penanganan': 'Kurangi penyiraman.',
-            'pencegahan': 'Drainase baik.'
+            'pencegahan': 'Drainase baik.',
+            'gambar': PENYAKIT_GAMBAR['P017'],
         },
         {
             'kode': 'P018',
@@ -201,7 +258,8 @@ def init_db():
             'nama_latin': '-',
             'deskripsi': 'Kerusakan akar akibat mekanis atau patogen.',
             'penanganan': 'Perbaiki kondisi tanah.',
-            'pencegahan': 'Hindari kerusakan akar.'
+            'pencegahan': 'Hindari kerusakan akar.',
+            'gambar': PENYAKIT_GAMBAR['P018'],
         },
         {
             'kode': 'P019',
@@ -209,7 +267,8 @@ def init_db():
             'nama_latin': '-',
             'deskripsi': 'Penurunan produktivitas karena usia tanaman.',
             'penanganan': 'Lakukan peremajaan.',
-            'pencegahan': 'Replanting berkala.'
+            'pencegahan': 'Replanting berkala.',
+            'gambar': PENYAKIT_GAMBAR['P019'],
         },
     ]
 
